@@ -1,0 +1,19 @@
+.venv/
+.env
+# database (contains PII: consent records, conversations, phone numbers)
+db.sqlite3
+*.sqlite3
+*.sqlite3-journal
+*.sqlite3-wal
+*.sqlite3-shm
+*.sql
+__pycache__/
+*.pyc
+*.pyo
+/static/
+/logs/
+# editor backups (e.g. .env~) and secret variants — must never be committed
+*~
+*.swp
+.env.*
+!.env.example

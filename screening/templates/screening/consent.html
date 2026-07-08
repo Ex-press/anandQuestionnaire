@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Proof of consent</title>
+  <style>
+    body { font-family: -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+           max-width: 640px; margin: 2.5rem auto; padding: 0 1rem; color: #1b1b1b; }
+    h1 { font-size: 1.4rem; }
+    form { margin: 1rem 0 1.5rem; }
+    input[type=text] { padding: .5rem; font-size: 1rem; width: 16rem; }
+    button { padding: .5rem .9rem; font-size: 1rem; cursor: pointer; }
+    .card { border: 1px solid #ddd; border-radius: 8px; padding: 1.25rem 1.5rem; }
+    .yes { color: #137333; font-weight: 600; }
+    .no  { color: #b3261e; font-weight: 600; }
+    .muted { color: #5f6368; }
+    table { border-collapse: collapse; margin-top: .5rem; }
+    th, td { text-align: left; padding: .35rem .75rem .35rem 0; vertical-align: top; }
+    th { color: #5f6368; font-weight: 500; white-space: nowrap; }
+    blockquote { margin: .25rem 0 0; padding: .5rem .75rem; background: #f6f6f6;
+                 border-left: 3px solid #ccc; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <h1>Proof of consent</h1>
+
+  <form method="get" action="">
+    <label for="phoneNumber">Phone number</label><br>
+    <input type="text" id="phoneNumber" name="phoneNumber" value="{{ phone }}"
+           placeholder="+12345678901" {% if not queried %}autofocus{% endif %}>
+    <button type="submit">Search</button>
+  </form>
+
+  {% if not queried %}
+    <p class="muted">Enter a phone number in E.164 format (e.g. <code>+12345678901</code>) and press Search
+    to check whether they have opted in.</p>
+  {% elif not person %}
+    <div class="card">
+      <p>No record found for <strong>{{ phone }}</strong>.</p>
+      <p class="no">✗ This number has not opted in.</p>
+    </div>
+  {% else %}
+    <div class="card">
+      <table>
+        <tr><th>Phone number</th><td>{{ person.phone_number }}</td></tr>
+        {% if person.name %}<tr><th>Name</th><td>{{ person.name }}</td></tr>{% endif %}
+        <tr>
+          <th>Opted in</th>
+          <td>
+            {% if person.consent_at %}
+              <span class="yes">✓ Yes</span>
+            {% else %}
+              <span class="no">✗ No</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% if person.consent_at %}
+        <tr><th>Consent received</th><td>{{ person.consent_at|date:"Y-m-d H:i:s e" }}</td></tr>
+        <tr>
+          <th>Message received</th>
+          <td><blockquote>{{ person.consent_text|default:"(empty)" }}</blockquote></td>
+        </tr>
+        {% if person.consent_message_sid %}
+        <tr><th>Twilio SID</th><td class="muted">{{ person.consent_message_sid }}</td></tr>
+        {% endif %}
+        {% endif %}
+        {% if person.opted_out %}
+        <tr><th>Opted out</th><td class="no">Yes (replied STOP){% if person.opted_out_at %} on {{ person.opted_out_at|date:"Y-m-d H:i:s e" }}{% endif %}</td></tr>
+        {% endif %}
+      </table>
+    </div>
+  {% endif %}
+</body>
+</html>

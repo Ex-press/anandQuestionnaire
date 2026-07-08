@@ -1,0 +1,23 @@
+# Install: sudo cp deploy/gunicorn-anand.service /etc/systemd/system/
+#          sudo systemctl daemon-reload && sudo systemctl enable --now gunicorn-anand
+[Unit]
+Description=Anand SMS epilepsy screening (gunicorn)
+After=network.target
+
+[Service]
+User=japhy
+Group=japhy
+WorkingDirectory=/home/japhy/anand.artiswrong.com
+EnvironmentFile=/home/japhy/anand.artiswrong.com/.env
+ExecStart=/home/japhy/anand.artiswrong.com/.venv/bin/gunicorn anand.wsgi:application \
+    --bind 127.0.0.1:8011 \
+    --worker-class gthread \
+    --workers 3 \
+    --threads 4 \
+    --timeout 60 \
+    --reload
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
